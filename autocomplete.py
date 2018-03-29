@@ -1,23 +1,39 @@
-def extract(query):
-    """extract takes in a `query` API function (which returns the first 5 usernames, lexicographically sorted,
-    that start with a prefix) and returns the sorted list of all usernames in the database.
-    For example, the `query` function in provided in `main` works as follows:
+def increment_last_letter(str):
+    if not str or len(str) == 1:
+        return ""
 
-    query("a") #=> ["abracadara", "al", "alice", "alicia", "allen"]
-    query("ab") #=> ["abracadara"]
-    The following implementation would pass the assertion in `main`, but is not a correct solution since it
-    works only for that example `query`:
-    def extract(query):
-        return query("ab") + query("al") + query("altercation") + query("b") + query("el") + query("ev") + query("m")
-    Your goal is to write an `extract` method that is correct for any provided `query`.
-    """
-    # YOUR CODE HERE
-    return query("ab")
+    chars = list(str)
+    index = len(chars) - 1
+
+    last_letter = chars[index]
+    if (last_letter == 'z'):
+        return increment_last_letter("".join(chars[:-1]))
+
+    chars[index] = chr(ord(last_letter) + 1)
+    return  "".join(chars)
+
+def find(query, to_find):
+    found = query(to_find)
+    if (len(found) == 5):
+        next_to_find = found[len(found) - 1]
+        while (next_to_find):
+            if (found[-1] == next_to_find):
+                found += find(query, next_to_find)[1:]
+            else:
+                found += find(query, next_to_find)
+            next_to_find = increment_last_letter(next_to_find)
+    return found
+
+def extract(query):
+    results = []
+    for i in range(ord("a"), ord("z")):
+        results += find(query, chr(i))
+    print "ME: ", results
+    return results
 
 def main():
-    """Runs your solution -- no need to update (except to maybe try out different databases)."""
-    # Sample implementation of the autocomplete API
     database = ["abracadara", "al", "alice", "alicia", "allen", "alter", "altercation", "bob", "element", "ello", "eve", "evening", "event", "eventually", "mallory"]
+    print "OK: ", database
     query = lambda prefix: [d for d in database if d.startswith(prefix)][:5]
     assert extract(query) == database
 

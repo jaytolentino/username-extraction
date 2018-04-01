@@ -1,4 +1,5 @@
 from autocomplete import *
+import sys
 
 def test_increment():
     test_case_single_letter_no_add = "a"
@@ -37,6 +38,11 @@ def test_extract():
     assert extract(query) == database
     print "Test extract(): provided database - PASSED"
 
+    database = ["abracadara", "al", "alice", "alicia", "allen", "alter", "altercation", "bob", "element", "ello", "eve", "evening", "event", "eventually", "mallory"]
+    query = lambda prefix: [d for d in database if d.startswith(prefix)][:2]
+    assert extract(query) == database
+    print "Test extract(): provided database with different query - PASSED"
+
     database = ["a"]
     query = lambda prefix: [d for d in database if d.startswith(prefix)][:5]
     assert extract(query) == database
@@ -49,12 +55,22 @@ def test_extract():
 
     print "Began processing large database..."
     database = []
-    with open("/Users/jay/Programming/OpenAI-Scholar-Application-2018/test_usernames.txt") as f:
+    with open("test_usernames.txt") as f:
         database = f.readlines()
         database = [x.strip() for x in database]
     query = lambda prefix: [d for d in database if d.startswith(prefix)][:5]
     assert extract(query) == database
     print "Test extract(): large database - PASSED"
+
+    sys.setrecursionlimit(10000)
+    print "Began processing deeply recursive database..."
+    database = []
+    with open("test_deep_usernames.txt") as f:
+        database = f.readlines()
+        database = [x.strip() for x in database]
+    query = lambda prefix: [d for d in database if d.startswith(prefix)][:4]
+    assert extract(query) == database
+    print "Test extract(): deeply with different query - PASSED"
 
 test_increment()
 test_extract()
